@@ -352,6 +352,65 @@ function CandidateCard({
   );
 }
 
+/* ─── Navbar ─────────────────────────────────────────── */
+function Navbar() {
+  return (
+    <motion.nav
+      initial={{ opacity: 0, y: -8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="sticky top-0 z-50 border-b border-neutral-200/60 bg-white/80 backdrop-blur-md"
+    >
+      <div className="mx-auto flex max-w-[1240px] items-center justify-between px-6 py-3">
+        <div className="flex items-center gap-3">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-neutral-900">
+            <svg
+              className="h-4 w-4 text-white"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2.4}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"
+              />
+            </svg>
+          </div>
+          <div>
+            <p className="text-sm font-semibold tracking-tight text-neutral-900">
+              CampusGigs
+            </p>
+            <p className="text-[10px] text-neutral-500">AI Micro-Job Matching</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-6">
+          <div className="hidden items-center gap-2 rounded-full bg-neutral-50 px-3 py-1.5 sm:flex">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+            <span className="text-xs font-medium text-neutral-600">
+              Matching engine online
+            </span>
+          </div>
+          <a
+            href="/"
+            className="text-xs font-medium text-neutral-600 transition-colors hover:text-neutral-900"
+          >
+            Gigs
+          </a>
+          <a
+            href="/"
+            className="text-xs font-medium text-neutral-600 transition-colors hover:text-neutral-900"
+          >
+            Students
+          </a>
+        </div>
+      </div>
+    </motion.nav>
+  );
+}
+
 /* ─── Main Page ────────────────────────────────────── */
 function Home() {
   const [form, setForm] = useState<GigInput>(emptyGig);

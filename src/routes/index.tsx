@@ -352,6 +352,65 @@ function CandidateCard({
   );
 }
 
+/* ─── Navbar ─────────────────────────────────────────── */
+function Navbar() {
+  return (
+    <motion.nav
+      initial={{ opacity: 0, y: -8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="sticky top-0 z-50 border-b border-neutral-200/60 bg-white/80 backdrop-blur-md"
+    >
+      <div className="mx-auto flex max-w-[1240px] items-center justify-between px-6 py-3">
+        <div className="flex items-center gap-3">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-neutral-900">
+            <svg
+              className="h-4 w-4 text-white"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2.4}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"
+              />
+            </svg>
+          </div>
+          <div>
+            <p className="text-sm font-semibold tracking-tight text-neutral-900">
+              CampusGigs
+            </p>
+            <p className="text-[10px] text-neutral-500">AI Micro-Job Matching</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-6">
+          <div className="hidden items-center gap-2 rounded-full bg-neutral-50 px-3 py-1.5 sm:flex">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+            <span className="text-xs font-medium text-neutral-600">
+              Matching engine online
+            </span>
+          </div>
+          <a
+            href="/"
+            className="text-xs font-medium text-neutral-600 transition-colors hover:text-neutral-900"
+          >
+            Gigs
+          </a>
+          <a
+            href="/"
+            className="text-xs font-medium text-neutral-600 transition-colors hover:text-neutral-900"
+          >
+            Students
+          </a>
+        </div>
+      </div>
+    </motion.nav>
+  );
+}
+
 /* ─── Main Page ────────────────────────────────────── */
 function Home() {
   const [form, setForm] = useState<GigInput>(emptyGig);
@@ -445,52 +504,13 @@ function Home() {
 
   return (
     <div className="min-h-screen bg-neutral-50 text-neutral-900 antialiased">
-      {/* Ambient background */}
-      <div className="pointer-events-none fixed inset-x-0 top-0 h-[500px] bg-[radial-gradient(ellipse_at_top,rgba(120,120,255,0.08),transparent_60%)]" />
+      <Navbar />
 
-      <main className="relative mx-auto max-w-[1240px] px-6 py-10 lg:py-14">
-        {/* Header */}
-        <motion.header
-          initial={{ opacity: 0, y: -8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="mb-10 flex items-center justify-between"
-        >
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-neutral-900 to-neutral-700 shadow-md shadow-neutral-900/20">
-              <svg
-                className="h-4 w-4 text-white"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2.4}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"
-                />
-              </svg>
-            </div>
-            <div>
-              <p className="text-sm font-semibold tracking-tight text-neutral-900">
-                CampusGigs
-              </p>
-              <p className="text-xs text-neutral-500">
-                AI Micro-Job Matching
-              </p>
-            </div>
-          </div>
-          <div className="hidden items-center gap-2 rounded-full bg-white px-3 py-1.5 shadow-sm ring-1 ring-neutral-200/60 sm:flex">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-            <span className="text-xs font-medium text-neutral-600">
-              Matching engine online
-            </span>
-          </div>
-        </motion.header>
+      <main className="mx-auto max-w-[1240px] px-6 pb-10 pt-6 lg:pb-14 lg:pt-8">
+
 
         {/* Grid */}
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,440px)_minmax(0,1fr)]">
+        <div className="grid gap-6 lg:grid-cols-2">
           {/* LEFT: Form */}
           <motion.div
             initial={{ opacity: 0, y: 12 }}

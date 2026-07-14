@@ -490,7 +490,7 @@ function Home() {
         </motion.header>
 
         {/* Grid */}
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,440px)_minmax(0,1fr)]">
+        <div className="grid gap-6 lg:grid-cols-2">
           {/* LEFT: Form */}
           <motion.div
             initial={{ opacity: 0, y: 12 }}

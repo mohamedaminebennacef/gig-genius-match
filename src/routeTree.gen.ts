@@ -9,38 +9,167 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as DashboardRouteImport } from './routes/_dashboard'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthRegisterRouteImport } from './routes/auth.register'
+import { Route as AuthLoginRouteImport } from './routes/auth.login'
+import { Route as DashboardStudentRouteImport } from './routes/_dashboard.student'
+import { Route as DashboardProfileRouteImport } from './routes/_dashboard.profile'
+import { Route as DashboardLeaderboardRouteImport } from './routes/_dashboard.leaderboard'
+import { Route as DashboardGigsRouteImport } from './routes/_dashboard.gigs'
+import { Route as DashboardDashboardRouteImport } from './routes/_dashboard.dashboard'
+import { Route as DashboardAssignedRouteImport } from './routes/_dashboard.assigned'
+import { Route as DashboardGigsNewRouteImport } from './routes/_dashboard.gigs.new'
 
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/_dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthRegisterRoute = AuthRegisterRouteImport.update({
+  id: '/auth/register',
+  path: '/auth/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthLoginRoute = AuthLoginRouteImport.update({
+  id: '/auth/login',
+  path: '/auth/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardStudentRoute = DashboardStudentRouteImport.update({
+  id: '/student',
+  path: '/student',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardProfileRoute = DashboardProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardLeaderboardRoute = DashboardLeaderboardRouteImport.update({
+  id: '/leaderboard',
+  path: '/leaderboard',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardGigsRoute = DashboardGigsRouteImport.update({
+  id: '/gigs',
+  path: '/gigs',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardDashboardRoute = DashboardDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardAssignedRoute = DashboardAssignedRouteImport.update({
+  id: '/assigned',
+  path: '/assigned',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardGigsNewRoute = DashboardGigsNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => DashboardGigsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/assigned': typeof DashboardAssignedRoute
+  '/dashboard': typeof DashboardDashboardRoute
+  '/gigs': typeof DashboardGigsRouteWithChildren
+  '/leaderboard': typeof DashboardLeaderboardRoute
+  '/profile': typeof DashboardProfileRoute
+  '/student': typeof DashboardStudentRoute
+  '/auth/login': typeof AuthLoginRoute
+  '/auth/register': typeof AuthRegisterRoute
+  '/gigs/new': typeof DashboardGigsNewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/assigned': typeof DashboardAssignedRoute
+  '/dashboard': typeof DashboardDashboardRoute
+  '/gigs': typeof DashboardGigsRouteWithChildren
+  '/leaderboard': typeof DashboardLeaderboardRoute
+  '/profile': typeof DashboardProfileRoute
+  '/student': typeof DashboardStudentRoute
+  '/auth/login': typeof AuthLoginRoute
+  '/auth/register': typeof AuthRegisterRoute
+  '/gigs/new': typeof DashboardGigsNewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_dashboard': typeof DashboardRouteWithChildren
+  '/_dashboard/assigned': typeof DashboardAssignedRoute
+  '/_dashboard/dashboard': typeof DashboardDashboardRoute
+  '/_dashboard/gigs': typeof DashboardGigsRouteWithChildren
+  '/_dashboard/leaderboard': typeof DashboardLeaderboardRoute
+  '/_dashboard/profile': typeof DashboardProfileRoute
+  '/_dashboard/student': typeof DashboardStudentRoute
+  '/auth/login': typeof AuthLoginRoute
+  '/auth/register': typeof AuthRegisterRoute
+  '/_dashboard/gigs/new': typeof DashboardGigsNewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/assigned'
+    | '/dashboard'
+    | '/gigs'
+    | '/leaderboard'
+    | '/profile'
+    | '/student'
+    | '/auth/login'
+    | '/auth/register'
+    | '/gigs/new'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/assigned'
+    | '/dashboard'
+    | '/gigs'
+    | '/leaderboard'
+    | '/profile'
+    | '/student'
+    | '/auth/login'
+    | '/auth/register'
+    | '/gigs/new'
+  id:
+    | '__root__'
+    | '/'
+    | '/_dashboard'
+    | '/_dashboard/assigned'
+    | '/_dashboard/dashboard'
+    | '/_dashboard/gigs'
+    | '/_dashboard/leaderboard'
+    | '/_dashboard/profile'
+    | '/_dashboard/student'
+    | '/auth/login'
+    | '/auth/register'
+    | '/_dashboard/gigs/new'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DashboardRoute: typeof DashboardRouteWithChildren
+  AuthLoginRoute: typeof AuthLoginRoute
+  AuthRegisterRoute: typeof AuthRegisterRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/_dashboard': {
+      id: '/_dashboard'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +177,112 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth/register': {
+      id: '/auth/register'
+      path: '/auth/register'
+      fullPath: '/auth/register'
+      preLoaderRoute: typeof AuthRegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/login': {
+      id: '/auth/login'
+      path: '/auth/login'
+      fullPath: '/auth/login'
+      preLoaderRoute: typeof AuthLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_dashboard/student': {
+      id: '/_dashboard/student'
+      path: '/student'
+      fullPath: '/student'
+      preLoaderRoute: typeof DashboardStudentRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/profile': {
+      id: '/_dashboard/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof DashboardProfileRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/leaderboard': {
+      id: '/_dashboard/leaderboard'
+      path: '/leaderboard'
+      fullPath: '/leaderboard'
+      preLoaderRoute: typeof DashboardLeaderboardRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/gigs': {
+      id: '/_dashboard/gigs'
+      path: '/gigs'
+      fullPath: '/gigs'
+      preLoaderRoute: typeof DashboardGigsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/dashboard': {
+      id: '/_dashboard/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardDashboardRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/assigned': {
+      id: '/_dashboard/assigned'
+      path: '/assigned'
+      fullPath: '/assigned'
+      preLoaderRoute: typeof DashboardAssignedRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/gigs/new': {
+      id: '/_dashboard/gigs/new'
+      path: '/new'
+      fullPath: '/gigs/new'
+      preLoaderRoute: typeof DashboardGigsNewRouteImport
+      parentRoute: typeof DashboardGigsRoute
+    }
   }
 }
 
+interface DashboardGigsRouteChildren {
+  DashboardGigsNewRoute: typeof DashboardGigsNewRoute
+}
+
+const DashboardGigsRouteChildren: DashboardGigsRouteChildren = {
+  DashboardGigsNewRoute: DashboardGigsNewRoute,
+}
+
+const DashboardGigsRouteWithChildren = DashboardGigsRoute._addFileChildren(
+  DashboardGigsRouteChildren,
+)
+
+interface DashboardRouteChildren {
+  DashboardAssignedRoute: typeof DashboardAssignedRoute
+  DashboardDashboardRoute: typeof DashboardDashboardRoute
+  DashboardGigsRoute: typeof DashboardGigsRouteWithChildren
+  DashboardLeaderboardRoute: typeof DashboardLeaderboardRoute
+  DashboardProfileRoute: typeof DashboardProfileRoute
+  DashboardStudentRoute: typeof DashboardStudentRoute
+}
+
+const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardAssignedRoute: DashboardAssignedRoute,
+  DashboardDashboardRoute: DashboardDashboardRoute,
+  DashboardGigsRoute: DashboardGigsRouteWithChildren,
+  DashboardLeaderboardRoute: DashboardLeaderboardRoute,
+  DashboardProfileRoute: DashboardProfileRoute,
+  DashboardStudentRoute: DashboardStudentRoute,
+}
+
+const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
+  DashboardRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DashboardRoute: DashboardRouteWithChildren,
+  AuthLoginRoute: AuthLoginRoute,
+  AuthRegisterRoute: AuthRegisterRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

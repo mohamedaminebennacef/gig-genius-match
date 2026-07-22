@@ -77,14 +77,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { title: "CampusGigs — AI Micro-Job Matching for Campuses" },
+      { name: "description", content: "CampusGigs uses AI to instantly match campus jobs with the best student candidates. Post a gig, get ranked recommendations in seconds." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "CampusGigs — AI Micro-Job Matching for Campuses" },
+      { property: "og:description", content: "CampusGigs uses AI to instantly match campus jobs with the best student candidates. Post a gig, get ranked recommendations in seconds." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "CampusGigs — AI Micro-Job Matching for Campuses" },
+      { name: "twitter:description", content: "CampusGigs uses AI to instantly match campus jobs with the best student candidates. Post a gig, get ranked recommendations in seconds." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/464d13e8-1da7-4102-a524-27da3396b84f/id-preview-f59128f2--e280ca9b-6636-46f4-ab19-5d78973f1683.lovable.app-1784716032251.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/464d13e8-1da7-4102-a524-27da3396b84f/id-preview-f59128f2--e280ca9b-6636-46f4-ab19-5d78973f1683.lovable.app-1784716032251.png" },
     ],
     links: [
       {

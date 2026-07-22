@@ -33,11 +33,11 @@ export const Route = createFileRoute("/")({
         content:
           "CampusGigs uses AI to instantly match campus jobs with the best student candidates. Post a gig, get ranked recommendations in seconds.",
       },
-      { property: "og:title", content: "CampusGigs — AI Micro-Job Matching" },
+      { property: "og:title", content: "CampusGigs — AI Micro-Job Matching for Campuses" },
       {
         property: "og:description",
         content:
-          "AI-powered micro-job matching platform for university campuses. Post, match, assign — in seconds.",
+          "CampusGigs uses AI to instantly match campus jobs with the best student candidates. Post a gig, get ranked recommendations in seconds.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

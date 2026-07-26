@@ -96,7 +96,7 @@ function Login() {
             <Separator className="flex-1" />
           </div>
 
-          <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+          <form className="space-y-4" onSubmit={handleSignIn}>
             <div className="space-y-1.5">
               <Label htmlFor="email">Email</Label>
               <Input id="email" type="email" placeholder="you@stanford.edu" className="rounded-lg" />
@@ -113,10 +113,12 @@ function Login() {
             <label className="flex items-center gap-2 text-xs text-slate-600">
               <Checkbox id="remember" /> <span>Keep me signed in for 30 days</span>
             </label>
-            <Button asChild className="w-full rounded-lg bg-slate-900 hover:bg-slate-800">
-              <Link to={role === "manager" ? "/dashboard" : "/student"}>
-                Sign in <ArrowRight className="ml-1.5 h-4 w-4" />
-              </Link>
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className="w-full rounded-lg bg-slate-900 hover:bg-slate-800"
+            >
+              {isLoading ? "Signing in…" : "Sign in"} <ArrowRight className="ml-1.5 h-4 w-4" />
             </Button>
           </form>
 

@@ -31,7 +31,6 @@ function Login() {
 
   const handleSignIn = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("handleSignIn called");
     setIsLoading(true);
 
     // Simulate a brief sign-in request, then show success toast and navigate.

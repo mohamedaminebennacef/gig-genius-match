@@ -26,6 +26,22 @@ export const Route = createFileRoute("/auth/login")({
 
 function Login() {
   const [role, setRole] = useState<"manager" | "student">("student");
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSignIn = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    // Simulate a brief sign-in request, then show success toast and navigate.
+    setTimeout(() => {
+      setIsLoading(false);
+      toast.success("Signed in successfully", {
+        description: `Welcome back to your ${role} workspace.`,
+      });
+      navigate({ to: role === "manager" ? "/dashboard" : "/student" });
+    }, 800);
+  };
 
   return (
     <div className="grid min-h-dvh lg:grid-cols-2 bg-white text-slate-900">

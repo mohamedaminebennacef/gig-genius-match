@@ -1,11 +1,21 @@
+import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { MapPin, Clock, DollarSign, User, Calendar, Briefcase } from "lucide-react";
+import { toast } from "sonner";
+import { MapPin, Clock, DollarSign, Calendar, Briefcase } from "lucide-react";
 
 import { DashboardShell, EmptyState } from "@/components/dashboard/shell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/_dashboard/assigned")({
   head: () => ({

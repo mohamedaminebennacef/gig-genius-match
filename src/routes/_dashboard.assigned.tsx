@@ -42,6 +42,11 @@ const gigs = [
     date: "Assigned Nov 12",
     status: "Confirmed",
     tone: "emerald",
+    description:
+      "Rebuild the campus marketing site with React and Tailwind. You'll pair with the design team on component work, ship weekly, and help set up analytics before launch.",
+    skills: ["React", "TypeScript", "Tailwind CSS", "Figma"],
+    schedule: "Mon / Wed / Fri · 9:00–13:00",
+    contact: "alex.kim@stanford.edu",
   },
   {
     title: "UX research volunteer",
@@ -53,8 +58,15 @@ const gigs = [
     date: "Assigned Nov 14",
     status: "Pending confirmation",
     tone: "amber",
+    description:
+      "Run 6 moderated usability sessions for a study on campus navigation tools, take structured notes, and summarize findings in a short readout deck.",
+    skills: ["User research", "Note taking", "Synthesis"],
+    schedule: "Flexible · sessions booked via Calendly",
+    contact: "priya.shah@stanford.edu",
   },
 ];
+
+type Gig = (typeof gigs)[number];
 
 const toneMap: Record<string, string> = {
   emerald: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400",
@@ -62,6 +74,8 @@ const toneMap: Record<string, string> = {
 };
 
 function Assigned() {
+  const [openGig, setOpenGig] = useState<Gig | null>(null);
+
   return (
     <DashboardShell breadcrumb="Assigned Gigs" title="Assigned gigs">
       {gigs.length === 0 ? (

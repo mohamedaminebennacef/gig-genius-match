@@ -64,7 +64,11 @@ function Assigned() {
           icon={Briefcase}
           title="No gigs yet"
           description="Complete your profile to start getting matched to campus gigs."
-          action={<Button>Complete profile</Button>}
+          action={
+            <Link to="/profile">
+              <Button>Complete profile</Button>
+            </Link>
+          }
         />
       ) : (
         <div className="grid gap-4 md:grid-cols-2">

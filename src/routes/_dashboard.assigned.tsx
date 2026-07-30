@@ -47,7 +47,38 @@ type Gig = {
   contact: string;
 };
 
-const gigs: Gig[] = [];
+const gigs: Gig[] = [
+  {
+    title: "Event Photographer — Spring Career Fair",
+    manager: "Career Center · Sarah Lin",
+    location: "Tresidder Memorial Union",
+    duration: "Mar 15 – Mar 16",
+    hours: "10:00 AM – 4:00 PM",
+    rate: "$22 / hour",
+    date: "Starts in 3 days",
+    status: "Confirmed",
+    tone: "emerald",
+    description: "Capture candid moments, employer booths, and student interactions during the two-day Spring Career Fair. Own camera preferred; editing is handled by the marketing team.",
+    skills: ["Photography", "Lightroom", "Event Coverage"],
+    schedule: "Sat 3/15 & Sun 3/16, 10am–4pm",
+    contact: "sarah.lin@university.edu",
+  },
+  {
+    title: "Coding Tutor — Intro to Python",
+    manager: "CS Department · Prof. Rivera",
+    location: "Huang Engineering Center",
+    duration: "Weekly through May",
+    hours: "6 hrs / week",
+    rate: "$20 / hour",
+    date: "Pending confirmation",
+    status: "Pending",
+    tone: "amber",
+    description: "Lead weekly office hours for introductory Python students. Help with assignments, debugging, and basic data structures.",
+    skills: ["Python", "Teaching", "Debugging"],
+    schedule: "Tue & Thu, 5pm–8pm",
+    contact: "rivera@cs.university.edu",
+  },
+];
 
 const toneMap: Record<string, string> = {
   emerald: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400",

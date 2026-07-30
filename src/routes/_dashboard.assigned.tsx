@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { MapPin, Clock, DollarSign, Calendar, Briefcase } from "lucide-react";
@@ -31,42 +31,23 @@ export const Route = createFileRoute("/_dashboard/assigned")({
   component: Assigned,
 });
 
-const gigs = [
-  {
-    title: "Frontend intern — Marketing site",
-    manager: "Alex Kim · Marketing Ops",
-    location: "Stanford — Gates",
-    duration: "6 weeks",
-    hours: "12 hrs/wk",
-    rate: "$28/hr",
-    date: "Assigned Nov 12",
-    status: "Confirmed",
-    tone: "emerald",
-    description:
-      "Rebuild the campus marketing site with React and Tailwind. You'll pair with the design team on component work, ship weekly, and help set up analytics before launch.",
-    skills: ["React", "TypeScript", "Tailwind CSS", "Figma"],
-    schedule: "Mon / Wed / Fri · 9:00–13:00",
-    contact: "alex.kim@stanford.edu",
-  },
-  {
-    title: "UX research volunteer",
-    manager: "Priya Shah · HCI Lab",
-    location: "Remote",
-    duration: "2 weeks",
-    hours: "4 hrs total",
-    rate: "Volunteer",
-    date: "Assigned Nov 14",
-    status: "Pending confirmation",
-    tone: "amber",
-    description:
-      "Run 6 moderated usability sessions for a study on campus navigation tools, take structured notes, and summarize findings in a short readout deck.",
-    skills: ["User research", "Note taking", "Synthesis"],
-    schedule: "Flexible · sessions booked via Calendly",
-    contact: "priya.shah@stanford.edu",
-  },
-];
+type Gig = {
+  title: string;
+  manager: string;
+  location: string;
+  duration: string;
+  hours: string;
+  rate: string;
+  date: string;
+  status: string;
+  tone: "emerald" | "amber";
+  description: string;
+  skills: string[];
+  schedule: string;
+  contact: string;
+};
 
-type Gig = (typeof gigs)[number];
+const gigs: Gig[] = [];
 
 const toneMap: Record<string, string> = {
   emerald: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400",
@@ -83,7 +64,11 @@ function Assigned() {
           icon={Briefcase}
           title="No gigs yet"
           description="Complete your profile to start getting matched to campus gigs."
-          action={<Button>Complete profile</Button>}
+          action={
+            <Link to="/profile">
+              <Button>Complete profile</Button>
+            </Link>
+          }
         />
       ) : (
         <div className="grid gap-4 md:grid-cols-2">

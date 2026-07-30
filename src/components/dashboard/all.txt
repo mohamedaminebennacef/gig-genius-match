@@ -1,0 +1,1774 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  Outlet,
+  Link,
+  createRootRouteWithContext,
+  useRouter,
+  HeadContent,
+  Scripts,
+} from "@tanstack/react-router";
+import { useEffect, type ReactNode } from "react";
+
+import appCss from "../styles.css?url";
+import { reportLovableError } from "../lib/lovable-error-reporting";
+
+function NotFoundComponent() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+      <div className="max-w-md text-center">
+        <h1 className="text-7xl font-bold text-foreground">404</h1>
+        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
+        <p className="mt-2 text-sm text-muted-foreground">
+          The page you're looking for doesn't exist or has been moved.
+        </p>
+        <div className="mt-6">
+          <Link
+            to="/"
+            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+          >
+            Go home
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+  console.error(error);
+  const router = useRouter();
+  useEffect(() => {
+    reportLovableError(error, { boundary: "tanstack_root_error_component" });
+  }, [error]);
+
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+      <div className="max-w-md text-center">
+        <h1 className="text-xl font-semibold tracking-tight text-foreground">
+          This page didn't load
+        </h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Something went wrong on our end. You can try refreshing or head back home.
+        </p>
+        <div className="mt-6 flex flex-wrap justify-center gap-2">
+          <button
+            onClick={() => {
+              router.invalidate();
+              reset();
+            }}
+            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+          >
+            Try again
+          </button>
+          <a
+            href="/"
+            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+          >
+            Go home
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  head: () => ({
+    meta: [
+      { charSet: "utf-8" },
+      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { title: "CampusGigs — AI Micro-Job Matching for Campuses" },
+      { name: "description", content: "CampusGigs uses AI to instantly match campus jobs with the best student candidates. Post a gig, get ranked recommendations in seconds." },
+      { name: "author", content: "Lovable" },
+      { property: "og:title", content: "CampusGigs — AI Micro-Job Matching for Campuses" },
+      { property: "og:description", content: "CampusGigs uses AI to instantly match campus jobs with the best student candidates. Post a gig, get ranked recommendations in seconds." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "CampusGigs — AI Micro-Job Matching for Campuses" },
+      { name: "twitter:description", content: "CampusGigs uses AI to instantly match campus jobs with the best student candidates. Post a gig, get ranked recommendations in seconds." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/464d13e8-1da7-4102-a524-27da3396b84f/id-preview-f59128f2--e280ca9b-6636-46f4-ab19-5d78973f1683.lovable.app-1784716032251.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/464d13e8-1da7-4102-a524-27da3396b84f/id-preview-f59128f2--e280ca9b-6636-46f4-ab19-5d78973f1683.lovable.app-1784716032251.png" },
+    ],
+    links: [
+      {
+        rel: "stylesheet",
+        href: appCss,
+      },
+      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+    ],
+  }),
+  shellComponent: RootShell,
+  component: RootComponent,
+  notFoundComponent: NotFoundComponent,
+  errorComponent: ErrorComponent,
+});
+
+function RootShell({ children }: { children: ReactNode }) {
+  return (
+    <html lang="en">
+      <head>
+        <HeadContent />
+      </head>
+      <body>
+        {children}
+        <Scripts />
+      </body>
+    </html>
+  );
+}
+
+function RootComponent() {
+  const { queryClient } = Route.useRouteContext();
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+      <Outlet />
+    </QueryClientProvider>
+  );
+}
+import { createFileRoute } from "@tanstack/react-router";
+import { motion } from "framer-motion";
+import { MapPin, Clock, DollarSign, User, Calendar, Briefcase } from "lucide-react";
+
+import { DashboardShell, EmptyState } from "@/components/dashboard/shell";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+
+export const Route = createFileRoute("/_dashboard/assigned")({
+  head: () => ({
+    meta: [
+      { title: "Assigned Gigs — CampusGigs" },
+      { name: "description", content: "Your currently assigned campus gigs and their details." },
+      { property: "og:title", content: "Assigned Gigs — CampusGigs" },
+      { property: "og:description", content: "Manage the gigs you've been assigned to." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
+  component: Assigned,
+});
+
+const gigs = [
+  {
+    title: "Frontend intern — Marketing site",
+    manager: "Alex Kim · Marketing Ops",
+    location: "Stanford — Gates",
+    duration: "6 weeks",
+    hours: "12 hrs/wk",
+    rate: "$28/hr",
+    date: "Assigned Nov 12",
+    status: "Confirmed",
+    tone: "emerald",
+  },
+  {
+    title: "UX research volunteer",
+    manager: "Priya Shah · HCI Lab",
+    location: "Remote",
+    duration: "2 weeks",
+    hours: "4 hrs total",
+    rate: "Volunteer",
+    date: "Assigned Nov 14",
+    status: "Pending confirmation",
+    tone: "amber",
+  },
+];
+
+const toneMap: Record<string, string> = {
+  emerald: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400",
+  amber: "bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-400",
+};
+
+function Assigned() {
+  return (
+    <DashboardShell breadcrumb="Assigned Gigs" title="Assigned gigs">
+      {gigs.length === 0 ? (
+        <EmptyState
+          icon={Briefcase}
+          title="No gigs yet"
+          description="Complete your profile to start getting matched to campus gigs."
+          action={<Button>Complete profile</Button>}
+        />
+      ) : (
+        <div className="grid gap-4 md:grid-cols-2">
+          {gigs.map((g, i) => (
+            <motion.article
+              key={g.title}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.05 }}
+              className="group rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs transition-shadow hover:shadow-md dark:border-slate-800 dark:bg-slate-900"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="truncate text-base font-semibold">{g.title}</p>
+                  <div className="mt-1 flex items-center gap-1.5 text-xs text-slate-500">
+                    <Avatar className="h-4 w-4"><AvatarFallback className="bg-slate-100 text-[8px] dark:bg-slate-800">{g.manager.slice(0,2)}</AvatarFallback></Avatar>
+                    <span className="truncate">{g.manager}</span>
+                  </div>
+                </div>
+                <Badge variant="secondary" className={toneMap[g.tone]}>{g.status}</Badge>
+              </div>
+
+              <dl className="mt-5 grid grid-cols-2 gap-3 text-sm">
+                <Item icon={MapPin} label="Location" value={g.location} />
+                <Item icon={Clock} label="Hours" value={g.hours} />
+                <Item icon={Calendar} label="Duration" value={g.duration} />
+                <Item icon={DollarSign} label="Rate" value={g.rate} />
+              </dl>
+
+              <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-4 dark:border-slate-800">
+                <span className="text-xs text-slate-500">{g.date}</span>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" className="rounded-lg">Message</Button>
+                  <Button size="sm" className="rounded-lg bg-slate-900 hover:bg-slate-800">Open</Button>
+                </div>
+              </div>
+            </motion.article>
+          ))}
+        </div>
+      )}
+    </DashboardShell>
+  );
+}
+
+function Item({ icon: Icon, label, value }: { icon: React.ComponentType<{className?:string}>; label: string; value: string }) {
+  return (
+    <div className="min-w-0">
+      <dt className="flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-slate-500">
+        <Icon className="h-3 w-3" /> {label}
+      </dt>
+      <dd className="mt-1 truncate text-sm font-medium">{value}</dd>
+    </div>
+  );
+}
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { motion } from "framer-motion";
+import {
+  Briefcase,
+  CheckCircle2,
+  Clock,
+  Users,
+  ArrowUpRight,
+  Plus,
+  MoreHorizontal,
+  Sparkles,
+  TrendingUp,
+} from "lucide-react";
+
+import { DashboardShell, StatCard } from "@/components/dashboard/shell";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+
+export const Route = createFileRoute("/_dashboard/dashboard")({
+  head: () => ({
+    meta: [
+      { title: "Manager Dashboard — CampusGigs" },
+      { name: "description", content: "Overview of your campus gigs, matches, and assignments." },
+      { property: "og:title", content: "Manager Dashboard — CampusGigs" },
+      { property: "og:description", content: "Analytics and quick actions for gig managers." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
+  component: ManagerDashboard,
+});
+
+const recentGigs = [
+  { title: "Frontend intern — Marketing site", status: "Assigned", match: "Maya Patel · 96%", tone: "emerald" },
+  { title: "Lab TA — CS 106B", status: "Matching", match: "Evaluating 18…", tone: "amber" },
+  { title: "Event photographer", status: "Pending", match: "3 candidates", tone: "slate" },
+  { title: "Data annotation (10h)", status: "Completed", match: "Jordan Lee · 92%", tone: "indigo" },
+];
+
+const toneMap: Record<string, string> = {
+  emerald: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400",
+  amber: "bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-400",
+  slate: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
+  indigo: "bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-400",
+};
+
+function ManagerDashboard() {
+  return (
+    <DashboardShell
+      breadcrumb="Dashboard"
+      title="Good morning, Alex"
+      actions={
+        <>
+          <Button variant="outline" className="rounded-lg">Export</Button>
+          <Button asChild className="rounded-lg bg-slate-900 hover:bg-slate-800">
+            <Link to="/gigs/new"><Plus className="mr-1.5 h-4 w-4" /> New gig</Link>
+          </Button>
+        </>
+      }
+    >
+      <div className="space-y-8">
+        {/* Stats */}
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <StatCard label="Total gigs" value="128" hint="Posted this semester" icon={Briefcase} trend={{ value: "+12%", positive: true }} />
+          <StatCard label="Assigned" value="94" hint="Active or completed" icon={CheckCircle2} trend={{ value: "+8%", positive: true }} />
+          <StatCard label="Pending match" value="14" hint="Awaiting your review" icon={Clock} />
+          <StatCard label="Candidates" value="1,204" hint="In your talent pool" icon={Users} trend={{ value: "+3.2%", positive: true }} />
+        </div>
+
+        {/* Chart + activity */}
+        <div className="grid gap-4 lg:grid-cols-3">
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs lg:col-span-2 dark:border-slate-800 dark:bg-slate-900"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-semibold">Match quality over time</h3>
+                <p className="text-xs text-slate-500">Average AI match score, last 30 days</p>
+              </div>
+              <Badge variant="secondary" className="gap-1"><TrendingUp className="h-3 w-3" /> 91.4 avg</Badge>
+            </div>
+            <div className="relative mt-6 h-48">
+              <svg viewBox="0 0 400 160" className="h-full w-full" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="rgb(15 23 42)" stopOpacity="0.15" />
+                    <stop offset="100%" stopColor="rgb(15 23 42)" stopOpacity="0" />
+                  </linearGradient>
+                </defs>
+                <path d="M0,110 C40,90 80,100 120,70 C160,45 200,80 240,55 C280,30 320,50 360,25 L400,20 L400,160 L0,160 Z" fill="url(#chartGrad)" />
+                <motion.path
+                  initial={{ pathLength: 0 }}
+                  animate={{ pathLength: 1 }}
+                  transition={{ duration: 1.4, ease: "easeOut" }}
+                  d="M0,110 C40,90 80,100 120,70 C160,45 200,80 240,55 C280,30 320,50 360,25 L400,20"
+                  fill="none"
+                  stroke="rgb(15 23 42)"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+              </svg>
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-between text-[10px] text-slate-400">
+                <span>Wk 1</span><span>Wk 2</span><span>Wk 3</span><span>Wk 4</span>
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs dark:border-slate-800 dark:bg-slate-900"
+          >
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-semibold">Quick actions</h3>
+              <Sparkles className="h-4 w-4 text-amber-500" />
+            </div>
+            <div className="mt-4 space-y-2">
+              {[
+                { label: "Post a new gig", to: "/gigs/new" as const },
+                { label: "Review pending matches", to: "/leaderboard" as const },
+                { label: "Invite a student", to: "/profile" as const },
+                { label: "View history", to: "/gigs" as const },
+              ].map((a) => (
+                <Link
+                  key={a.label}
+                  to={a.to}
+                  className="flex items-center justify-between rounded-lg border border-slate-200 px-3 py-2 text-sm hover:border-slate-300 hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800"
+                >
+                  {a.label} <ArrowUpRight className="h-3.5 w-3.5 text-slate-400" />
+                </Link>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Recent gigs table */}
+        <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-xs dark:border-slate-800 dark:bg-slate-900">
+          <div className="flex items-center justify-between border-b border-slate-200/80 px-6 py-4 dark:border-slate-800">
+            <div>
+              <h3 className="text-sm font-semibold">Recent gigs</h3>
+              <p className="text-xs text-slate-500">Latest activity across your workspace</p>
+            </div>
+            <Button variant="ghost" size="sm" asChild><Link to="/gigs">View all</Link></Button>
+          </div>
+          <div className="divide-y divide-slate-100 dark:divide-slate-800">
+            {recentGigs.map((g, i) => (
+              <motion.div
+                key={g.title}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.05 * i }}
+                className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-6 py-4 hover:bg-slate-50/60 dark:hover:bg-slate-800/40"
+              >
+                <div className="flex min-w-0 items-center gap-3">
+                  <Avatar className="h-9 w-9 shrink-0">
+                    <AvatarFallback className="bg-slate-100 text-xs dark:bg-slate-800">
+                      {g.title.split(" ")[0].slice(0, 2)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium">{g.title}</p>
+                    <p className="truncate text-xs text-slate-500">{g.match}</p>
+                  </div>
+                </div>
+                <div className="flex shrink-0 items-center gap-3">
+                  <Badge variant="secondary" className={toneMap[g.tone]}>{g.status}</Badge>
+                  <Button variant="ghost" size="icon" aria-label="More"><MoreHorizontal className="h-4 w-4" /></Button>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </DashboardShell>
+  );
+}
+import { createFileRoute } from "@tanstack/react-router";
+import { motion } from "framer-motion";
+import { CheckCircle2, Sparkles, X, Wand2 } from "lucide-react";
+import { useState } from "react";
+
+import { DashboardShell } from "@/components/dashboard/shell";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+export const Route = createFileRoute("/_dashboard/gigs/new")({
+  head: () => ({
+    meta: [
+      { title: "Create a gig — CampusGigs" },
+      { name: "description", content: "Post a new campus gig and get AI-ranked student candidates in seconds." },
+      { property: "og:title", content: "Create a gig — CampusGigs" },
+      { property: "og:description", content: "Describe the role — our AI does the matching." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
+  component: CreateGig,
+});
+
+const SECTIONS = [
+  { id: "basics", title: "Basics", desc: "Title, description, and category" },
+  { id: "requirements", title: "Requirements", desc: "Skills, availability, level" },
+  { id: "logistics", title: "Logistics", desc: "Location, hours, pay" },
+  { id: "review", title: "Review", desc: "Confirm and post" },
+] as const;
+
+function CreateGig() {
+  const [active, setActive] = useState<(typeof SECTIONS)[number]["id"]>("basics");
+  const [skills, setSkills] = useState<string[]>(["React", "TypeScript", "Figma"]);
+  const [title, setTitle] = useState("Frontend intern — Marketing site");
+
+  return (
+    <DashboardShell breadcrumb="Create gig" title="Create a new gig">
+      <div className="grid gap-8 lg:grid-cols-[220px_minmax(0,1fr)_320px]">
+        {/* Progress sidebar */}
+        <aside className="hidden lg:block">
+          <ol className="space-y-1">
+            {SECTIONS.map((s, i) => {
+              const isActive = active === s.id;
+              const done = SECTIONS.findIndex((x) => x.id === active) > i;
+              return (
+                <li key={s.id}>
+                  <button
+                    onClick={() => setActive(s.id)}
+                    className={`flex w-full items-start gap-3 rounded-xl px-3 py-2.5 text-left transition ${
+                      isActive ? "bg-slate-900 text-white" : "hover:bg-slate-100 dark:hover:bg-slate-800"
+                    }`}
+                  >
+                    <span className={`mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full text-[10px] font-medium ${
+                      isActive
+                        ? "bg-white text-slate-900"
+                        : done
+                          ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300"
+                          : "bg-slate-100 text-slate-500 dark:bg-slate-800"
+                    }`}>
+                      {done ? <CheckCircle2 className="h-3 w-3" /> : i + 1}
+                    </span>
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium">{s.title}</p>
+                      <p className={`truncate text-xs ${isActive ? "text-white/60" : "text-slate-500"}`}>
+                        {s.desc}
+                      </p>
+                    </div>
+                  </button>
+                </li>
+              );
+            })}
+          </ol>
+        </aside>
+
+        {/* Form */}
+        <motion.section
+          key={active}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs dark:border-slate-800 dark:bg-slate-900"
+        >
+          {active === "basics" && (
+            <div className="space-y-5">
+              <SectionHeader title="Basics" desc="Give your gig a clear title and describe the work." />
+              <Field label="Title">
+                <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Frontend intern" className="rounded-lg" />
+              </Field>
+              <Field label="Category">
+                <Select defaultValue="engineering">
+                  <SelectTrigger className="rounded-lg"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="engineering">Engineering</SelectItem>
+                    <SelectItem value="design">Design</SelectItem>
+                    <SelectItem value="research">Research</SelectItem>
+                    <SelectItem value="ops">Operations</SelectItem>
+                  </SelectContent>
+                </Select>
+              </Field>
+              <Field label="Description">
+                <div className="relative">
+                  <Textarea rows={6} className="rounded-lg" defaultValue="Help build our marketing site in Next.js. You'll work closely with design to ship pixel-perfect components." />
+                  <button className="absolute bottom-2 right-2 inline-flex items-center gap-1 rounded-md bg-slate-900 px-2 py-1 text-[11px] text-white hover:bg-slate-800">
+                    <Wand2 className="h-3 w-3" /> Rewrite with AI
+                  </button>
+                </div>
+              </Field>
+            </div>
+          )}
+
+          {active === "requirements" && (
+            <div className="space-y-5">
+              <SectionHeader title="Requirements" desc="What skills matter most for this gig?" />
+              <Field label="Skills">
+                <div className="flex flex-wrap gap-1.5 rounded-lg border border-slate-200 bg-slate-50/60 p-2 dark:border-slate-800 dark:bg-slate-950/40">
+                  {skills.map((s) => (
+                    <Badge key={s} variant="secondary" className="gap-1">
+                      {s}
+                      <button onClick={() => setSkills(skills.filter((x) => x !== s))} aria-label={`Remove ${s}`}>
+                        <X className="h-3 w-3" />
+                      </button>
+                    </Badge>
+                  ))}
+                  <input
+                    className="flex-1 min-w-[8ch] bg-transparent text-sm outline-none"
+                    placeholder="Type a skill and press Enter…"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && e.currentTarget.value.trim()) {
+                        setSkills([...skills, e.currentTarget.value.trim()]);
+                        e.currentTarget.value = "";
+                      }
+                    }}
+                  />
+                </div>
+              </Field>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field label="Experience level">
+                  <Select defaultValue="intermediate">
+                    <SelectTrigger className="rounded-lg"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="intro">Intro</SelectItem>
+                      <SelectItem value="intermediate">Intermediate</SelectItem>
+                      <SelectItem value="advanced">Advanced</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </Field>
+                <Field label="Availability (hrs/week)">
+                  <Input type="number" defaultValue={12} className="rounded-lg" />
+                </Field>
+              </div>
+            </div>
+          )}
+
+          {active === "logistics" && (
+            <div className="space-y-5">
+              <SectionHeader title="Logistics" desc="Where, when, and how much." />
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field label="Location"><Input defaultValue="Stanford — Gates Building" className="rounded-lg" /></Field>
+                <Field label="Duration"><Input defaultValue="6 weeks" className="rounded-lg" /></Field>
+                <Field label="Hourly rate"><Input defaultValue="$28" className="rounded-lg" /></Field>
+                <Field label="Start date"><Input type="date" className="rounded-lg" /></Field>
+              </div>
+            </div>
+          )}
+
+          {active === "review" && (
+            <div className="space-y-4">
+              <SectionHeader title="Review & post" desc="Final check before AI matching begins." />
+              <div className="rounded-xl border border-slate-200 p-5 dark:border-slate-800">
+                <h4 className="text-sm font-semibold">{title}</h4>
+                <p className="mt-1 text-xs text-slate-500">Stanford · 12 hrs/week · $28/hr · Intermediate</p>
+                <div className="mt-3 flex flex-wrap gap-1.5">
+                  {skills.map((s) => <Badge key={s} variant="secondary">{s}</Badge>)}
+                </div>
+              </div>
+              <Button className="w-full rounded-lg bg-slate-900 hover:bg-slate-800">
+                <Sparkles className="mr-1.5 h-4 w-4" /> Post gig & run AI match
+              </Button>
+            </div>
+          )}
+
+          {/* Nav */}
+          <div className="mt-8 flex items-center justify-between border-t border-slate-200/80 pt-5 dark:border-slate-800">
+            <Button
+              variant="outline"
+              className="rounded-lg"
+              disabled={active === "basics"}
+              onClick={() => {
+                const i = SECTIONS.findIndex((s) => s.id === active);
+                if (i > 0) setActive(SECTIONS[i - 1].id);
+              }}
+            >
+              Back
+            </Button>
+            {active !== "review" && (
+              <Button
+                className="rounded-lg bg-slate-900 hover:bg-slate-800"
+                onClick={() => {
+                  const i = SECTIONS.findIndex((s) => s.id === active);
+                  if (i < SECTIONS.length - 1) setActive(SECTIONS[i + 1].id);
+                }}
+              >
+                Continue
+              </Button>
+            )}
+          </div>
+        </motion.section>
+
+        {/* Summary panel */}
+        <aside className="hidden lg:block">
+          <div className="sticky top-24 space-y-4">
+            <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-slate-900">
+              <div className="flex items-center gap-2">
+                <div className="grid h-8 w-8 place-items-center rounded-lg bg-slate-900 text-white dark:bg-white dark:text-slate-900">
+                  <Sparkles className="h-4 w-4" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold">Live preview</p>
+                  <p className="text-xs text-slate-500">Updates as you type</p>
+                </div>
+              </div>
+              <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50/50 p-4 dark:border-slate-800 dark:bg-slate-950/50">
+                <p className="text-sm font-semibold">{title || "Untitled gig"}</p>
+                <p className="mt-1 text-xs text-slate-500">Stanford · 12 hrs/wk · $28/hr</p>
+                <div className="mt-3 flex flex-wrap gap-1">
+                  {skills.slice(0, 5).map((s) => <Badge key={s} variant="secondary" className="text-[10px]">{s}</Badge>)}
+                </div>
+              </div>
+            </div>
+            <div className="rounded-2xl border border-slate-200/80 bg-gradient-to-br from-slate-900 to-slate-800 p-5 text-white shadow-sm">
+              <p className="text-xs font-medium uppercase tracking-wider text-white/60">Estimated match</p>
+              <p className="mt-2 text-2xl font-semibold">~24 candidates</p>
+              <p className="mt-1 text-xs text-white/60">Top match ETA · under 8 seconds</p>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </DashboardShell>
+  );
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="space-y-1.5">
+      <Label className="text-xs font-medium text-slate-600 dark:text-slate-400">{label}</Label>
+      {children}
+    </div>
+  );
+}
+
+function SectionHeader({ title, desc }: { title: string; desc: string }) {
+  return (
+    <div>
+      <h2 className="text-lg font-semibold tracking-tight">{title}</h2>
+      <p className="text-sm text-slate-500">{desc}</p>
+    </div>
+  );
+}
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { motion } from "framer-motion";
+import { Search, Filter, Plus, MoreHorizontal, Briefcase, Inbox } from "lucide-react";
+import { useState } from "react";
+
+import { DashboardShell, EmptyState } from "@/components/dashboard/shell";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+export const Route = createFileRoute("/_dashboard/gigs")({
+  head: () => ({
+    meta: [
+      { title: "Gig History — CampusGigs" },
+      { name: "description", content: "Browse and filter every gig posted on your CampusGigs workspace." },
+      { property: "og:title", content: "Gig History — CampusGigs" },
+      { property: "og:description", content: "Search, filter, and review posted campus gigs." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
+  component: Gigs,
+});
+
+const GIGS = [
+  { id: "g1", title: "Frontend intern — Marketing site", cat: "Engineering", status: "Assigned", assignee: "Maya Patel", rate: "$28/hr", date: "2 days ago" },
+  { id: "g2", title: "Lab TA — CS 106B", cat: "Teaching", status: "Matching", assignee: "—", rate: "$22/hr", date: "5 hrs ago" },
+  { id: "g3", title: "Event photographer", cat: "Media", status: "Pending", assignee: "—", rate: "$40/hr", date: "1 day ago" },
+  { id: "g4", title: "Data annotation (10h)", cat: "Research", status: "Completed", assignee: "Jordan Lee", rate: "$18/hr", date: "1 week ago" },
+  { id: "g5", title: "React Native contract", cat: "Engineering", status: "Assigned", assignee: "Priya Nair", rate: "$35/hr", date: "3 days ago" },
+  { id: "g6", title: "Copywriter — newsletter", cat: "Writing", status: "Completed", assignee: "Diego Ramos", rate: "$25/hr", date: "2 weeks ago" },
+];
+
+const toneMap: Record<string, string> = {
+  Assigned: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400",
+  Matching: "bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-400",
+  Pending: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
+  Completed: "bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-400",
+};
+
+function Gigs() {
+  const [q, setQ] = useState("");
+  const [tab, setTab] = useState("all");
+  const filtered = GIGS.filter((g) => (tab === "all" ? true : g.status.toLowerCase() === tab)).filter((g) =>
+    g.title.toLowerCase().includes(q.toLowerCase()),
+  );
+
+  return (
+    <DashboardShell
+      breadcrumb="Gig History"
+      title="Gig History"
+      actions={
+        <Button asChild className="rounded-lg bg-slate-900 hover:bg-slate-800">
+          <Link to="/gigs/new"><Plus className="mr-1.5 h-4 w-4" /> New gig</Link>
+        </Button>
+      }
+    >
+      <div className="space-y-5">
+        {/* Toolbar */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <Tabs value={tab} onValueChange={setTab}>
+            <TabsList className="rounded-xl">
+              <TabsTrigger value="all">All</TabsTrigger>
+              <TabsTrigger value="matching">Matching</TabsTrigger>
+              <TabsTrigger value="assigned">Assigned</TabsTrigger>
+              <TabsTrigger value="completed">Completed</TabsTrigger>
+              <TabsTrigger value="pending">Pending</TabsTrigger>
+            </TabsList>
+          </Tabs>
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Input
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder="Search gigs…"
+                className="h-9 w-56 rounded-lg pl-9"
+              />
+            </div>
+            <Button variant="outline" size="sm" className="rounded-lg gap-1.5">
+              <Filter className="h-3.5 w-3.5" /> Filter
+            </Button>
+          </div>
+        </div>
+
+        {/* Table */}
+        {filtered.length === 0 ? (
+          <EmptyState
+            icon={Inbox}
+            title="No gigs match"
+            description="Try adjusting your filters or clear your search."
+            action={<Button variant="outline" onClick={() => { setQ(""); setTab("all"); }}>Reset</Button>}
+          />
+        ) : (
+          <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-xs dark:border-slate-800 dark:bg-slate-900">
+            <div className="hidden grid-cols-[minmax(0,2fr)_1fr_1fr_1fr_1fr_auto] items-center gap-4 border-b border-slate-200/80 bg-slate-50/60 px-6 py-3 text-[11px] font-medium uppercase tracking-wider text-slate-500 md:grid dark:border-slate-800 dark:bg-slate-950/40">
+              <span>Gig</span><span>Category</span><span>Status</span><span>Assignee</span><span>Rate</span><span>Posted</span>
+            </div>
+            <div className="divide-y divide-slate-100 dark:divide-slate-800">
+              {filtered.map((g, i) => (
+                <motion.div
+                  key={g.id}
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.03 }}
+                  className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 px-4 py-4 md:grid-cols-[minmax(0,2fr)_1fr_1fr_1fr_1fr_auto] md:items-center md:gap-4 md:px-6 hover:bg-slate-50/60 dark:hover:bg-slate-800/40"
+                >
+                  <div className="flex min-w-0 items-center gap-3">
+                    <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-slate-100 dark:bg-slate-800">
+                      <Briefcase className="h-4 w-4 text-slate-500" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium">{g.title}</p>
+                      <p className="truncate text-xs text-slate-500 md:hidden">{g.cat} · {g.rate} · {g.date}</p>
+                    </div>
+                  </div>
+                  <div className="hidden text-sm text-slate-600 md:block dark:text-slate-400">{g.cat}</div>
+                  <div className="hidden md:block"><Badge variant="secondary" className={toneMap[g.status]}>{g.status}</Badge></div>
+                  <div className="hidden items-center gap-2 md:flex">
+                    {g.assignee !== "—" ? (
+                      <>
+                        <Avatar className="h-6 w-6"><AvatarFallback className="bg-slate-100 text-[10px] dark:bg-slate-800">{g.assignee.split(" ").map(x=>x[0]).join("")}</AvatarFallback></Avatar>
+                        <span className="text-sm">{g.assignee}</span>
+                      </>
+                    ) : <span className="text-sm text-slate-400">Unassigned</span>}
+                  </div>
+                  <div className="hidden text-sm md:block">{g.rate}</div>
+                  <div className="flex items-center gap-3">
+                    <span className="hidden text-xs text-slate-500 md:block">{g.date}</span>
+                    <Button variant="ghost" size="icon" aria-label="More"><MoreHorizontal className="h-4 w-4" /></Button>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+            <div className="flex items-center justify-between border-t border-slate-200/80 px-6 py-3 text-xs text-slate-500 dark:border-slate-800">
+              <span>Showing {filtered.length} of {GIGS.length}</span>
+              <div className="flex gap-1">
+                <Button variant="outline" size="sm" className="h-7">Previous</Button>
+                <Button variant="outline" size="sm" className="h-7">Next</Button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </DashboardShell>
+  );
+}
+import { createFileRoute } from "@tanstack/react-router";
+import { motion } from "framer-motion";
+import { Trophy, Sparkles, Star, MapPin, Clock, CheckCircle2, ChevronDown } from "lucide-react";
+
+import { DashboardShell } from "@/components/dashboard/shell";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+export const Route = createFileRoute("/_dashboard/leaderboard")({
+  head: () => ({
+    meta: [
+      { title: "Leaderboard — CampusGigs" },
+      { name: "description", content: "AI-ranked candidates with match reasoning for each gig." },
+      { property: "og:title", content: "Leaderboard — CampusGigs" },
+      { property: "og:description", content: "See top student matches ranked by AI." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
+  component: Leaderboard,
+});
+
+const CANDIDATES = [
+  {
+    name: "Maya Patel", match: 96, initials: "MP", year: "Junior · CS",
+    reason: "Strong React portfolio, previously interned at a design-forward SaaS. Ships polished UI fast.",
+    skills: ["React", "TypeScript", "Figma", "Motion"],
+    location: "On campus", availability: "15 hrs/wk",
+    tone: "from-amber-400 to-amber-500",
+  },
+  {
+    name: "Jordan Lee", match: 92, initials: "JL", year: "Senior · HCI",
+    reason: "Deep design systems experience. Built the university career portal's component library.",
+    skills: ["React", "Storybook", "Figma"],
+    location: "Hybrid", availability: "12 hrs/wk",
+    tone: "from-indigo-400 to-indigo-500",
+  },
+  {
+    name: "Priya Nair", match: 88, initials: "PN", year: "Sophomore · CS",
+    reason: "Fast learner with recent Next.js projects. Availability aligns perfectly with sprint plan.",
+    skills: ["Next.js", "TypeScript"],
+    location: "On campus", availability: "18 hrs/wk",
+    tone: "from-emerald-400 to-emerald-500",
+  },
+  {
+    name: "Diego Ramos", match: 84, initials: "DR", year: "Junior · Design",
+    reason: "Strong visual craft, limited framework depth. Could pair well on marketing site polish.",
+    skills: ["Figma", "HTML/CSS", "Framer"],
+    location: "Remote", availability: "10 hrs/wk",
+    tone: "from-rose-400 to-rose-500",
+  },
+];
+
+function Leaderboard() {
+  return (
+    <DashboardShell
+      breadcrumb="Leaderboard"
+      title="Frontend intern — Marketing site"
+      actions={
+        <>
+          <Select defaultValue="score">
+            <SelectTrigger className="w-40 rounded-lg"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="score">Sort: Match score</SelectItem>
+              <SelectItem value="avail">Sort: Availability</SelectItem>
+              <SelectItem value="year">Sort: Year</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button variant="outline" className="rounded-lg">Export CSV</Button>
+        </>
+      }
+    >
+      <div className="space-y-8">
+        {/* Top match spotlight */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-8 text-white shadow-xl"
+        >
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(217,164,65,0.25),transparent_50%)]" />
+          <div className="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-amber-500/10 blur-3xl" />
+          <div className="relative grid gap-6 md:grid-cols-[auto_minmax(0,1fr)_auto] md:items-center">
+            <div className="relative">
+              <MatchRing value={96} />
+              <div className="absolute -bottom-1 -right-1 grid h-8 w-8 place-items-center rounded-full border-2 border-slate-950 bg-amber-500 text-white shadow-lg">
+                <Trophy className="h-4 w-4" />
+              </div>
+            </div>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <Badge className="border-amber-500/30 bg-amber-500/15 text-amber-300 hover:bg-amber-500/20">
+                  <Sparkles className="mr-1 h-3 w-3" /> Best match
+                </Badge>
+                <span className="text-xs text-white/50">Ranked #1 of 24</span>
+              </div>
+              <h2 className="mt-3 text-2xl font-semibold tracking-tight">Maya Patel</h2>
+              <p className="text-sm text-white/60">Junior · Computer Science · Stanford</p>
+              <p className="mt-3 max-w-xl text-sm leading-relaxed text-white/80">
+                Strong React portfolio with production experience shipping marketing sites. AI notes exceptional
+                alignment on TypeScript depth and design collaboration signal.
+              </p>
+              <div className="mt-4 flex flex-wrap gap-1.5">
+                {["React", "TypeScript", "Figma", "Motion", "Next.js"].map((s) => (
+                  <Badge key={s} variant="secondary" className="border-white/10 bg-white/10 text-white hover:bg-white/15">{s}</Badge>
+                ))}
+              </div>
+            </div>
+            <div className="flex flex-col gap-2">
+              <Button className="rounded-lg bg-white text-slate-900 hover:bg-white/90">
+                <CheckCircle2 className="mr-1.5 h-4 w-4" /> Assign
+              </Button>
+              <Button variant="outline" className="rounded-lg border-white/20 bg-white/5 text-white hover:bg-white/10">
+                View profile
+              </Button>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Runner-ups */}
+        <div className="grid gap-4 md:grid-cols-2">
+          {CANDIDATES.slice(1).map((c, i) => (
+            <motion.article
+              key={c.name}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.05 * i }}
+              className="group rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs transition-all hover:-translate-y-0.5 hover:shadow-md dark:border-slate-800 dark:bg-slate-900"
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex min-w-0 items-center gap-3">
+                  <div className="relative">
+                    <Avatar className="h-11 w-11">
+                      <AvatarFallback className={`bg-gradient-to-br ${c.tone} text-sm text-white`}>{c.initials}</AvatarFallback>
+                    </Avatar>
+                    <span className="absolute -bottom-1 -right-1 grid h-5 w-5 place-items-center rounded-full border-2 border-white bg-slate-900 text-[9px] font-semibold text-white dark:border-slate-900 dark:bg-white dark:text-slate-900">
+                      #{i + 2}
+                    </span>
+                  </div>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold">{c.name}</p>
+                    <p className="truncate text-xs text-slate-500">{c.year}</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-2xl font-semibold tabular-nums">{c.match}<span className="text-sm text-slate-400">%</span></p>
+                  <p className="text-[10px] uppercase tracking-wider text-slate-400">match</p>
+                </div>
+              </div>
+
+              <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${c.match}%` }}
+                  transition={{ delay: 0.2 + i * 0.1, duration: 0.9, ease: "easeOut" }}
+                  className="h-full rounded-full bg-slate-900 dark:bg-white"
+                />
+              </div>
+
+              <p className="mt-4 line-clamp-2 text-sm text-slate-600 dark:text-slate-400">{c.reason}</p>
+
+              <div className="mt-4 flex flex-wrap gap-1.5">
+                {c.skills.map((s) => <Badge key={s} variant="secondary" className="text-[11px]">{s}</Badge>)}
+              </div>
+
+              <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-xs text-slate-500 dark:border-slate-800">
+                <span className="flex items-center gap-1"><MapPin className="h-3 w-3" /> {c.location}</span>
+                <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> {c.availability}</span>
+                <Button variant="ghost" size="sm" className="h-7 px-2 text-xs">
+                  Details <ChevronDown className="ml-1 h-3 w-3" />
+                </Button>
+              </div>
+
+              <div className="mt-3 flex gap-2">
+                <Button variant="outline" size="sm" className="flex-1 rounded-lg"><Star className="mr-1.5 h-3.5 w-3.5" /> Shortlist</Button>
+                <Button size="sm" className="flex-1 rounded-lg bg-slate-900 hover:bg-slate-800">Assign</Button>
+              </div>
+            </motion.article>
+          ))}
+        </div>
+      </div>
+    </DashboardShell>
+  );
+}
+
+function MatchRing({ value }: { value: number }) {
+  const size = 96;
+  const stroke = 8;
+  const r = (size - stroke) / 2;
+  const c = 2 * Math.PI * r;
+  return (
+    <div className="relative" style={{ width: size, height: size }}>
+      <svg width={size} height={size} className="-rotate-90">
+        <circle cx={size / 2} cy={size / 2} r={r} strokeWidth={stroke} stroke="rgba(255,255,255,0.1)" fill="none" />
+        <motion.circle
+          cx={size / 2} cy={size / 2} r={r} strokeWidth={stroke} fill="none"
+          stroke="url(#ringGrad)" strokeLinecap="round"
+          strokeDasharray={c}
+          initial={{ strokeDashoffset: c }}
+          animate={{ strokeDashoffset: c - (value / 100) * c }}
+          transition={{ duration: 1.2, ease: "easeOut" }}
+        />
+        <defs>
+          <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#fbbf24" />
+            <stop offset="100%" stopColor="#f59e0b" />
+          </linearGradient>
+        </defs>
+      </svg>
+      <div className="absolute inset-0 grid place-items-center">
+        <div className="text-center">
+          <p className="text-2xl font-semibold tabular-nums">{value}</p>
+          <p className="text-[10px] uppercase tracking-wider text-white/50">match</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+import { createFileRoute } from "@tanstack/react-router";
+import { motion } from "framer-motion";
+import { Camera, X, Plus, Sparkles } from "lucide-react";
+import { useState } from "react";
+
+import { DashboardShell } from "@/components/dashboard/shell";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Progress } from "@/components/ui/progress";
+
+export const Route = createFileRoute("/_dashboard/profile")({
+  head: () => ({
+    meta: [
+      { title: "Profile — CampusGigs" },
+      { name: "description", content: "Edit your CampusGigs profile — skills, interests, availability, and more." },
+      { property: "og:title", content: "Profile — CampusGigs" },
+      { property: "og:description", content: "Keep your profile fresh for better AI matches." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
+  component: Profile,
+});
+
+function Profile() {
+  const [skills, setSkills] = useState(["React", "TypeScript", "Figma", "Framer Motion", "Node.js"]);
+  const [interests, setInterests] = useState(["Design systems", "Developer tools", "Climate tech"]);
+
+  return (
+    <DashboardShell breadcrumb="Profile" title="Your profile"
+      actions={<Button className="rounded-lg bg-slate-900 hover:bg-slate-800">Save changes</Button>}
+    >
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
+        {/* Main form */}
+        <div className="space-y-6">
+          {/* Header card */}
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-xs dark:border-slate-800 dark:bg-slate-900"
+          >
+            <div className="h-28 bg-gradient-to-br from-indigo-500 via-purple-500 to-amber-400" />
+            <div className="px-6 pb-6">
+              <div className="-mt-10 flex items-end gap-4">
+                <div className="relative">
+                  <Avatar className="h-20 w-20 border-4 border-white shadow-md dark:border-slate-900">
+                    <AvatarFallback className="bg-slate-900 text-lg text-white">MP</AvatarFallback>
+                  </Avatar>
+                  <button className="absolute bottom-0 right-0 grid h-7 w-7 place-items-center rounded-full border-2 border-white bg-slate-900 text-white hover:bg-slate-800 dark:border-slate-900" aria-label="Change photo">
+                    <Camera className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+                <div className="pb-1 min-w-0">
+                  <p className="truncate text-lg font-semibold">Maya Patel</p>
+                  <p className="text-sm text-slate-500">Junior · Computer Science · Stanford</p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Basics */}
+          <Section title="About you">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="First name"><Input defaultValue="Maya" className="rounded-lg" /></Field>
+              <Field label="Last name"><Input defaultValue="Patel" className="rounded-lg" /></Field>
+              <Field label="Major"><Input defaultValue="Computer Science" className="rounded-lg" /></Field>
+              <Field label="Graduation year"><Input defaultValue="2026" className="rounded-lg" /></Field>
+            </div>
+            <Field label="Bio">
+              <Textarea rows={4} className="rounded-lg" defaultValue="Frontend engineer who cares deeply about accessibility and craft. Currently building a design system for the CS department." />
+            </Field>
+          </Section>
+
+          {/* Skills */}
+          <Section title="Skills">
+            <ChipInput items={skills} setItems={setSkills} placeholder="Add a skill…" />
+          </Section>
+
+          {/* Interests */}
+          <Section title="Interests">
+            <ChipInput items={interests} setItems={setInterests} placeholder="Add an interest…" tone="indigo" />
+          </Section>
+
+          {/* Availability */}
+          <Section title="Availability">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="Hours per week">
+                <Select defaultValue="10-15">
+                  <SelectTrigger className="rounded-lg"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="0-5">0–5 hrs</SelectItem>
+                    <SelectItem value="5-10">5–10 hrs</SelectItem>
+                    <SelectItem value="10-15">10–15 hrs</SelectItem>
+                    <SelectItem value="15+">15+ hrs</SelectItem>
+                  </SelectContent>
+                </Select>
+              </Field>
+              <Field label="Preferred mode">
+                <Select defaultValue="hybrid">
+                  <SelectTrigger className="rounded-lg"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="onsite">On campus</SelectItem>
+                    <SelectItem value="hybrid">Hybrid</SelectItem>
+                    <SelectItem value="remote">Remote</SelectItem>
+                  </SelectContent>
+                </Select>
+              </Field>
+            </div>
+          </Section>
+        </div>
+
+        {/* Sidebar */}
+        <aside className="space-y-4">
+          <div className="sticky top-24 space-y-4">
+            <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-slate-900">
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-amber-500" />
+                <p className="text-sm font-semibold">Profile completion</p>
+              </div>
+              <div className="mt-4">
+                <div className="flex items-baseline justify-between">
+                  <span className="text-3xl font-semibold">82<span className="text-base text-slate-400">%</span></span>
+                  <span className="text-xs text-slate-500">+8% this week</span>
+                </div>
+                <Progress value={82} className="mt-3 h-1.5" />
+              </div>
+              <ul className="mt-5 space-y-2 text-xs">
+                <Check label="Basics complete" done />
+                <Check label="Skills added" done />
+                <Check label="Add 2 projects" />
+                <Check label="Upload headshot" />
+              </ul>
+            </div>
+            <div className="rounded-2xl border border-slate-200/80 bg-gradient-to-br from-slate-900 to-slate-800 p-5 text-white shadow-sm">
+              <p className="text-xs font-medium uppercase tracking-wider text-white/60">This week</p>
+              <p className="mt-2 text-2xl font-semibold">7 profile views</p>
+              <p className="mt-1 text-xs text-white/60">From 3 different managers</p>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </DashboardShell>
+  );
+}
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs dark:border-slate-800 dark:bg-slate-900">
+      <h2 className="text-sm font-semibold">{title}</h2>
+      <div className="mt-4 space-y-4">{children}</div>
+    </section>
+  );
+}
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="space-y-1.5">
+      <Label className="text-xs font-medium text-slate-600 dark:text-slate-400">{label}</Label>
+      {children}
+    </div>
+  );
+}
+function Check({ label, done }: { label: string; done?: boolean }) {
+  return (
+    <li className="flex items-center gap-2">
+      <span className={`grid h-4 w-4 place-items-center rounded-full text-[9px] ${done ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300" : "bg-slate-100 text-slate-400 dark:bg-slate-800"}`}>
+        {done ? "✓" : "•"}
+      </span>
+      <span className={done ? "text-slate-600 dark:text-slate-300" : "text-slate-500"}>{label}</span>
+    </li>
+  );
+}
+function ChipInput({ items, setItems, placeholder, tone = "slate" }: { items: string[]; setItems: (v:string[]) => void; placeholder: string; tone?: "slate" | "indigo" }) {
+  const chipCls = tone === "indigo" ? "bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300" : "";
+  return (
+    <div className="flex flex-wrap gap-1.5 rounded-lg border border-slate-200 bg-slate-50/60 p-2 dark:border-slate-800 dark:bg-slate-950/40">
+      {items.map((s) => (
+        <Badge key={s} variant="secondary" className={`${chipCls} gap-1`}>
+          {s}
+          <button onClick={() => setItems(items.filter((x) => x !== s))} aria-label={`Remove ${s}`}>
+            <X className="h-3 w-3" />
+          </button>
+        </Badge>
+      ))}
+      <div className="flex items-center gap-1">
+        <Plus className="h-3 w-3 text-slate-400" />
+        <input
+          className="min-w-[10ch] bg-transparent text-sm outline-none"
+          placeholder={placeholder}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && e.currentTarget.value.trim()) {
+              setItems([...items, e.currentTarget.value.trim()]);
+              e.currentTarget.value = "";
+            }
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { motion } from "framer-motion";
+import { Briefcase, CheckCircle2, Clock, Award, Sparkles, ArrowUpRight, TrendingUp } from "lucide-react";
+
+import { DashboardShell, StatCard } from "@/components/dashboard/shell";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+
+export const Route = createFileRoute("/_dashboard/student")({
+  head: () => ({
+    meta: [
+      { title: "Student Dashboard — CampusGigs" },
+      { name: "description", content: "Your upcoming gigs, stats, and profile progress on CampusGigs." },
+      { property: "og:title", content: "Student Dashboard — CampusGigs" },
+      { property: "og:description", content: "Track assigned gigs and your matching stats." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
+  component: StudentDashboard,
+});
+
+const timeline = [
+  { title: "Assigned to Frontend intern", when: "2 hours ago", tone: "emerald" },
+  { title: "Profile viewed by 3 managers", when: "Yesterday", tone: "indigo" },
+  { title: "Completed Data annotation gig", when: "3 days ago", tone: "slate" },
+  { title: "New skill endorsement: React", when: "1 week ago", tone: "amber" },
+];
+
+const upcoming = [
+  { title: "Frontend intern — Marketing site", when: "Starts Mon · 12 hrs/wk", pay: "$28/hr", status: "Confirmed" },
+  { title: "UX research volunteer", when: "Next Wed · 4 hrs", pay: "Volunteer", status: "Pending" },
+];
+
+function StudentDashboard() {
+  return (
+    <DashboardShell breadcrumb="Dashboard" title="Hey Maya, ready to work?">
+      <div className="space-y-8">
+        {/* Profile completion banner */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="rounded-2xl border border-slate-200/80 bg-gradient-to-br from-slate-900 to-slate-800 p-6 text-white shadow-sm"
+        >
+          <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-amber-400" />
+                <span className="text-xs font-medium uppercase tracking-wider text-white/60">Profile strength</span>
+              </div>
+              <p className="mt-2 text-lg font-semibold">Your profile is 82% complete</p>
+              <p className="mt-1 text-sm text-white/60">Add 2 projects and a headshot to unlock premium matches.</p>
+              <div className="mt-4 h-2 max-w-md overflow-hidden rounded-full bg-white/10">
+                <motion.div initial={{ width: 0 }} animate={{ width: "82%" }} transition={{ duration: 1 }} className="h-full rounded-full bg-gradient-to-r from-amber-400 to-amber-500" />
+              </div>
+            </div>
+            <Button asChild className="rounded-lg bg-white text-slate-900 hover:bg-white/90 shrink-0">
+              <Link to="/profile">Complete profile</Link>
+            </Button>
+          </div>
+        </motion.div>
+
+        {/* Stats */}
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <StatCard label="Assigned" value="2" hint="Active gigs" icon={Briefcase} />
+          <StatCard label="Completed" value="14" hint="This semester" icon={CheckCircle2} trend={{ value: "+3", positive: true }} />
+          <StatCard label="Hours logged" value="132" hint="Last 30 days" icon={Clock} />
+          <StatCard label="Avg. rating" value="4.9" hint="From 12 reviews" icon={Award} trend={{ value: "★", positive: true }} />
+        </div>
+
+        {/* Upcoming + Activity */}
+        <div className="grid gap-4 lg:grid-cols-3">
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs lg:col-span-2 dark:border-slate-800 dark:bg-slate-900"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-semibold">Upcoming work</h3>
+                <p className="text-xs text-slate-500">Your scheduled gigs</p>
+              </div>
+              <Button variant="ghost" size="sm" asChild><Link to="/assigned">All assigned</Link></Button>
+            </div>
+            <div className="mt-4 space-y-3">
+              {upcoming.map((u) => (
+                <div key={u.title} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-xl border border-slate-100 p-4 hover:border-slate-200 dark:border-slate-800">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium">{u.title}</p>
+                    <p className="truncate text-xs text-slate-500">{u.when} · {u.pay}</p>
+                  </div>
+                  <Badge variant="secondary" className={u.status === "Confirmed" ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400" : "bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-400"}>
+                    {u.status}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs dark:border-slate-800 dark:bg-slate-900"
+          >
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-semibold">Activity</h3>
+              <TrendingUp className="h-4 w-4 text-slate-400" />
+            </div>
+            <ul className="mt-4 space-y-4">
+              {timeline.map((t, i) => (
+                <li key={i} className="relative flex gap-3 pl-3">
+                  <span className={`absolute left-0 top-1.5 h-2 w-2 rounded-full bg-${t.tone}-500`} />
+                  <div className="min-w-0">
+                    <p className="truncate text-sm">{t.title}</p>
+                    <p className="text-xs text-slate-500">{t.when}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <Button variant="ghost" size="sm" className="mt-2 w-full">View all <ArrowUpRight className="ml-1 h-3 w-3" /></Button>
+          </motion.div>
+        </div>
+
+        {/* Skill progress */}
+        <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs dark:border-slate-800 dark:bg-slate-900">
+          <h3 className="text-sm font-semibold">Top matched skills</h3>
+          <p className="text-xs text-slate-500">Based on gigs assigned to you</p>
+          <div className="mt-4 space-y-3">
+            {[{s:"React",v:94},{s:"TypeScript",v:88},{s:"Figma",v:76},{s:"Node.js",v:62}].map(x => (
+              <div key={x.s} className="grid grid-cols-[100px_minmax(0,1fr)_40px] items-center gap-3">
+                <span className="text-sm">{x.s}</span>
+                <Progress value={x.v} className="h-1.5" />
+                <span className="text-right text-xs tabular-nums text-slate-500">{x.v}%</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </DashboardShell>
+  );
+}
+import { createFileRoute, Outlet } from "@tanstack/react-router";
+
+export const Route = createFileRoute("/_dashboard")({
+  component: () => <Outlet />,
+});
+import { Link, useRouterState } from "@tanstack/react-router";
+import { motion } from "framer-motion";
+import {
+  LayoutDashboard,
+  PlusCircle,
+  History,
+  User,
+  LogOut,
+  Search,
+  Bell,
+  Sun,
+  Moon,
+  Sparkles,
+  Trophy,
+  Briefcase,
+  ChevronsUpDown,
+  Command,
+} from "lucide-react";
+import { useEffect, useState, type ReactNode } from "react";
+
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
+
+type Role = "manager" | "student";
+
+const managerNav = [
+  { title: "Dashboard", to: "/dashboard", icon: LayoutDashboard },
+  { title: "Create Gig", to: "/gigs/new", icon: PlusCircle },
+  { title: "Leaderboard", to: "/leaderboard", icon: Trophy },
+  { title: "Gig History", to: "/gigs", icon: History },
+  { title: "Profile", to: "/profile", icon: User },
+] as const;
+
+const studentNav = [
+  { title: "Dashboard", to: "/student", icon: LayoutDashboard },
+  { title: "Assigned Gigs", to: "/assigned", icon: Briefcase },
+  { title: "History", to: "/gigs", icon: History },
+  { title: "Profile", to: "/profile", icon: User },
+] as const;
+
+export function DashboardShell({
+  children,
+  breadcrumb,
+  title,
+  actions,
+}: {
+  children: ReactNode;
+  breadcrumb?: string;
+  title?: string;
+  actions?: ReactNode;
+}) {
+  const pathname = useRouterState({ select: (r) => r.location.pathname });
+  const [role, setRole] = useState<Role>("manager");
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+
+  useEffect(() => {
+    const stored = (typeof window !== "undefined" && localStorage.getItem("cg_role")) as Role | null;
+    if (stored) setRole(stored);
+    const t = typeof window !== "undefined" && localStorage.getItem("cg_theme");
+    if (t === "dark") {
+      setTheme("dark");
+      document.documentElement.classList.add("dark");
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const next = theme === "light" ? "dark" : "light";
+    setTheme(next);
+    document.documentElement.classList.toggle("dark", next === "dark");
+    localStorage.setItem("cg_theme", next);
+  };
+
+  const switchRole = (r: Role) => {
+    setRole(r);
+    localStorage.setItem("cg_role", r);
+  };
+
+  const nav = role === "manager" ? managerNav : studentNav;
+
+  return (
+    <div className="flex min-h-dvh bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+      {/* Sidebar */}
+      <aside className="hidden lg:flex w-64 shrink-0 flex-col border-r border-slate-200/80 bg-white/70 backdrop-blur-xl dark:border-slate-800 dark:bg-slate-900/50">
+        <div className="flex h-16 items-center gap-2 border-b border-slate-200/80 px-5 dark:border-slate-800">
+          <div className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-slate-900 to-slate-700 text-white shadow-sm dark:from-white dark:to-slate-300 dark:text-slate-900">
+            <Sparkles className="h-4 w-4" />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-sm font-semibold tracking-tight">CampusGigs</span>
+            <span className="text-[10px] uppercase tracking-wider text-slate-500">
+              {role === "manager" ? "Manager" : "Student"} Workspace
+            </span>
+          </div>
+        </div>
+
+        {/* Role switcher */}
+        <div className="px-3 pt-4">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="flex w-full items-center justify-between rounded-lg border border-slate-200 bg-white px-3 py-2 text-left text-sm shadow-xs hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800">
+                <div className="flex items-center gap-2 min-w-0">
+                  <Avatar className="h-6 w-6">
+                    <AvatarFallback className="bg-slate-900 text-[10px] text-white dark:bg-white dark:text-slate-900">
+                      {role === "manager" ? "M" : "S"}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="truncate font-medium">
+                    {role === "manager" ? "Manager view" : "Student view"}
+                  </span>
+                </div>
+                <ChevronsUpDown className="h-3.5 w-3.5 text-slate-400" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-56">
+              <DropdownMenuLabel className="text-xs">Switch role</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => switchRole("manager")}>
+                <LayoutDashboard className="mr-2 h-4 w-4" /> Manager
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => switchRole("student")}>
+                <User className="mr-2 h-4 w-4" /> Student
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+
+        {/* Nav */}
+        <nav className="flex-1 space-y-0.5 px-3 py-4">
+          <p className="px-2 pb-2 text-[10px] font-medium uppercase tracking-wider text-slate-400">
+            Workspace
+          </p>
+          {nav.map((item) => {
+            const active = pathname === item.to;
+            return (
+              <Link
+                key={item.to}
+                to={item.to}
+                className={cn(
+                  "group flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-medium transition-all",
+                  active
+                    ? "bg-slate-900 text-white shadow-sm dark:bg-white dark:text-slate-900"
+                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white",
+                )}
+              >
+                <item.icon className={cn("h-4 w-4", active ? "" : "text-slate-400 group-hover:text-slate-600")} />
+                {item.title}
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div className="mt-auto p-3">
+          <div className="rounded-xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-4 dark:border-slate-800 dark:from-slate-900 dark:to-slate-950">
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-amber-500" />
+              <span className="text-xs font-semibold">Pro tips</span>
+            </div>
+            <p className="mt-1.5 text-xs text-slate-500">
+              Add detailed skills to gigs for sharper AI matches.
+            </p>
+          </div>
+          <Link
+            to="/auth/login"
+            className="mt-3 flex items-center gap-2 rounded-lg px-2.5 py-2 text-sm text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-slate-800 dark:hover:text-white"
+          >
+            <LogOut className="h-4 w-4" /> Sign out
+          </Link>
+        </div>
+      </aside>
+
+      {/* Main */}
+      <div className="flex min-w-0 flex-1 flex-col">
+        {/* Topbar */}
+        <header className="sticky top-0 z-40 flex h-16 items-center gap-3 border-b border-slate-200/80 bg-white/70 px-4 backdrop-blur-xl dark:border-slate-800 dark:bg-slate-900/50 lg:px-8">
+          <div className="flex flex-1 items-center gap-3 min-w-0">
+            <div className="hidden md:flex items-center gap-1.5 text-xs text-slate-500">
+              <Link to="/dashboard" className="hover:text-slate-900 dark:hover:text-white">
+                CampusGigs
+              </Link>
+              {breadcrumb && (
+                <>
+                  <span>/</span>
+                  <span className="text-slate-900 dark:text-white font-medium">{breadcrumb}</span>
+                </>
+              )}
+            </div>
+            <div className="relative ml-auto max-w-md flex-1">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Input
+                placeholder="Search gigs, students, skills…"
+                className="h-9 rounded-lg border-slate-200 bg-slate-50 pl-9 pr-16 text-sm shadow-none focus-visible:bg-white dark:border-slate-800 dark:bg-slate-900"
+              />
+              <kbd className="pointer-events-none absolute right-2 top-1/2 hidden -translate-y-1/2 items-center gap-1 rounded-md border border-slate-200 bg-white px-1.5 py-0.5 text-[10px] font-medium text-slate-500 md:flex dark:border-slate-700 dark:bg-slate-800">
+                <Command className="h-3 w-3" /> K
+              </kbd>
+            </div>
+          </div>
+          <div className="flex items-center gap-1">
+            <Button variant="ghost" size="icon" aria-label="Toggle theme" onClick={toggleTheme}>
+              {theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+            </Button>
+            <Button variant="ghost" size="icon" aria-label="Notifications" className="relative">
+              <Bell className="h-4 w-4" />
+              <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-emerald-500" />
+            </Button>
+            <Separator orientation="vertical" className="mx-1 h-6" />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex items-center gap-2 rounded-lg px-1.5 py-1 hover:bg-slate-100 dark:hover:bg-slate-800">
+                  <Avatar className="h-7 w-7">
+                    <AvatarFallback className="bg-gradient-to-br from-indigo-500 to-purple-600 text-xs text-white">
+                      AK
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="hidden text-sm font-medium md:block">Alex Kim</span>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium">Alex Kim</span>
+                    <span className="text-xs text-slate-500">alex@stanford.edu</span>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/profile"><User className="mr-2 h-4 w-4" /> Profile</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/auth/login"><LogOut className="mr-2 h-4 w-4" /> Sign out</Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </header>
+
+        {/* Page header */}
+        {(title || actions) && (
+          <div className="border-b border-slate-200/80 bg-white/40 px-4 py-6 dark:border-slate-800 dark:bg-slate-900/30 lg:px-8">
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4">
+              <div className="min-w-0">
+                {title && (
+                  <h1 className="truncate text-2xl font-semibold tracking-tight">{title}</h1>
+                )}
+              </div>
+              {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
+            </div>
+          </div>
+        )}
+
+        {/* Content */}
+        <motion.main
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+          className="flex-1 p-4 pb-24 lg:p-8"
+        >
+          {children}
+        </motion.main>
+
+        {/* Mobile bottom nav */}
+        <nav className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around border-t border-slate-200 bg-white/90 px-2 py-2 backdrop-blur-xl lg:hidden dark:border-slate-800 dark:bg-slate-900/90">
+          {nav.slice(0, 4).map((item) => {
+            const active = pathname === item.to;
+            return (
+              <Link
+                key={item.to}
+                to={item.to}
+                className={cn(
+                  "flex flex-col items-center gap-0.5 rounded-lg px-3 py-1.5 text-[10px] font-medium",
+                  active ? "text-slate-900 dark:text-white" : "text-slate-400",
+                )}
+              >
+                <item.icon className="h-5 w-5" />
+                {item.title}
+              </Link>
+            );
+          })}
+        </nav>
+      </div>
+    </div>
+  );
+}
+
+export function StatCard({
+  label,
+  value,
+  hint,
+  icon: Icon,
+  trend,
+}: {
+  label: string;
+  value: string;
+  hint?: string;
+  icon: React.ComponentType<{ className?: string }>;
+  trend?: { value: string; positive?: boolean };
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="group relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs transition-shadow hover:shadow-md dark:border-slate-800 dark:bg-slate-900"
+    >
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-medium uppercase tracking-wider text-slate-500">{label}</span>
+        <div className="grid h-8 w-8 place-items-center rounded-lg bg-slate-100 text-slate-600 group-hover:bg-slate-900 group-hover:text-white dark:bg-slate-800 dark:text-slate-300 transition-colors">
+          <Icon className="h-4 w-4" />
+        </div>
+      </div>
+      <div className="mt-3 flex items-baseline gap-2">
+        <span className="text-3xl font-semibold tracking-tight">{value}</span>
+        {trend && (
+          <Badge
+            variant="secondary"
+            className={cn(
+              "font-medium",
+              trend.positive
+                ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400"
+                : "bg-rose-50 text-rose-700 dark:bg-rose-950 dark:text-rose-400",
+            )}
+          >
+            {trend.value}
+          </Badge>
+        )}
+      </div>
+      {hint && <p className="mt-1 text-xs text-slate-500">{hint}</p>}
+    </motion.div>
+  );
+}
+
+export function EmptyState({
+  icon: Icon,
+  title,
+  description,
+  action,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  description: string;
+  action?: ReactNode;
+}) {
+  return (
+    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-white/60 p-12 text-center dark:border-slate-800 dark:bg-slate-900/40">
+      <div className="grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-slate-100 to-white text-slate-500 shadow-xs dark:from-slate-800 dark:to-slate-900">
+        <Icon className="h-6 w-6" />
+      </div>
+      <h3 className="mt-4 text-base font-semibold">{title}</h3>
+      <p className="mt-1 max-w-sm text-sm text-slate-500">{description}</p>
+      {action && <div className="mt-5">{action}</div>}
+    </div>
+  );
+}

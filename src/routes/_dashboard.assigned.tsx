@@ -31,9 +31,23 @@ export const Route = createFileRoute("/_dashboard/assigned")({
   component: Assigned,
 });
 
-const gigs: Gig[] = [];
+type Gig = {
+  title: string;
+  manager: string;
+  location: string;
+  duration: string;
+  hours: string;
+  rate: string;
+  date: string;
+  status: string;
+  tone: "emerald" | "amber";
+  description: string;
+  skills: string[];
+  schedule: string;
+  contact: string;
+};
 
-type Gig = (typeof gigs)[number];
+const gigs: Gig[] = [];
 
 const toneMap: Record<string, string> = {
   emerald: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400",

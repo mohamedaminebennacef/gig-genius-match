@@ -116,17 +116,84 @@ function Assigned() {
               <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-4 dark:border-slate-800">
                 <span className="text-xs text-slate-500">{g.date}</span>
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm" className="rounded-lg">Message</Button>
-                  <Button size="sm" className="rounded-lg bg-slate-900 hover:bg-slate-800">Open</Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="rounded-lg"
+                    onClick={() => toast.success(`Message sent to ${g.manager.split(" · ")[0]}`, { description: "They usually reply within a day." })}
+                  >
+                    Message
+                  </Button>
+                  <Button
+                    size="sm"
+                    className="rounded-lg bg-slate-900 hover:bg-slate-800"
+                    onClick={() => setOpenGig(g)}
+                  >
+                    Open
+                  </Button>
                 </div>
               </div>
             </motion.article>
           ))}
         </div>
       )}
+
+      <Dialog open={openGig !== null} onOpenChange={(o) => !o && setOpenGig(null)}>
+        <DialogContent className="sm:max-w-lg">
+          {openGig && (
+            <>
+              <DialogHeader>
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary" className={toneMap[openGig.tone]}>{openGig.status}</Badge>
+                  <span className="text-xs text-slate-500">{openGig.date}</span>
+                </div>
+                <DialogTitle className="mt-2 text-left text-lg">{openGig.title}</DialogTitle>
+                <DialogDescription className="text-left">{openGig.manager}</DialogDescription>
+              </DialogHeader>
+
+              <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">{openGig.description}</p>
+
+              <dl className="grid grid-cols-2 gap-4 rounded-xl border border-slate-100 p-4 text-sm dark:border-slate-800">
+                <Item icon={MapPin} label="Location" value={openGig.location} />
+                <Item icon={Clock} label="Hours" value={openGig.hours} />
+                <Item icon={Calendar} label="Duration" value={openGig.duration} />
+                <Item icon={DollarSign} label="Rate" value={openGig.rate} />
+              </dl>
+
+              <div>
+                <p className="text-[11px] uppercase tracking-wider text-slate-500">Skills</p>
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {openGig.skills.map((s) => (
+                    <Badge key={s} variant="secondary" className="rounded-md font-normal">{s}</Badge>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-1 text-sm">
+                <p className="text-slate-500"><span className="text-[11px] uppercase tracking-wider">Schedule</span> · {openGig.schedule}</p>
+                <p className="text-slate-500"><span className="text-[11px] uppercase tracking-wider">Contact</span> · {openGig.contact}</p>
+              </div>
+
+              <DialogFooter>
+                <Button variant="outline" className="rounded-lg" onClick={() => setOpenGig(null)}>Close</Button>
+                <Button
+                  className="rounded-lg bg-slate-900 hover:bg-slate-800"
+                  onClick={() => {
+                    toast.success("Attendance confirmed", { description: openGig.title });
+                    setOpenGig(null);
+                  }}
+                >
+                  Confirm attendance
+                </Button>
+              </DialogFooter>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </DashboardShell>
   );
 }
+
 
 function Item({ icon: Icon, label, value }: { icon: React.ComponentType<{className?:string}>; label: string; value: string }) {
   return (
